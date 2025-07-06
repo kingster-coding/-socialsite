@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Login | SocialSite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap');
 
@@ -18,7 +19,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
             position: relative;
             overflow: hidden;
         }
@@ -52,29 +53,29 @@
             background-image: 
                 linear-gradient(rgba(255, 20, 147, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 20, 147, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background-size: 30px 30px;
             animation: gridMove 20s linear infinite;
             pointer-events: none;
         }
 
         @keyframes gridMove {
             0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+            100% { transform: translate(30px, 30px); }
         }
 
         .login-container {
             background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 20, 147, 0.4);
-            border-radius: 30px;
-            padding: 50px;
+            border-radius: 20px;
+            padding: 25px 20px;
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.9),
-                0 0 100px rgba(255, 20, 147, 0.3),
+                0 15px 30px rgba(0, 0, 0, 0.9),
+                0 0 50px rgba(255, 20, 147, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1),
                 inset 0 -1px 0 rgba(255, 20, 147, 0.2);
             width: 100%;
-            max-width: 480px;
+            max-width: 360px;
             position: relative;
             z-index: 10;
             animation: containerFloat 0.8s ease-out;
@@ -84,7 +85,7 @@
         @keyframes containerFloat {
             from {
                 opacity: 0;
-                transform: translateY(100px) scale(0.8);
+                transform: translateY(50px) scale(0.9);
             }
             to {
                 opacity: 1;
@@ -95,14 +96,14 @@
         .login-container::before {
             content: '';
             position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
             background: linear-gradient(45deg, 
                 #ff1493, #8a2be2, #ff69b4, #9370db, 
                 #ff1493, #8a2be2, #ff69b4, #9370db);
-            border-radius: 33px;
+            border-radius: 22px;
             z-index: -1;
             animation: borderGlow 3s linear infinite;
             opacity: 0.8;
@@ -132,21 +133,21 @@
 
         .logo-section {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .logo-icon {
-            width: 80px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #ff1493, #8a2be2);
             border-radius: 50%;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 24px;
             color: white;
-            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
             animation: logoSpin 4s linear infinite;
         }
 
@@ -157,18 +158,18 @@
 
         h2 {
             font-family: 'Orbitron', monospace;
-            font-size: 42px;
+            font-size: 28px;
             font-weight: 900;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             background: linear-gradient(45deg, #ff1493, #ffffff, #8a2be2, #ff69b4);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: textGradient 3s ease infinite;
-            letter-spacing: 3px;
-            text-shadow: 0 0 30px rgba(255, 20, 147, 0.7);
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 20, 147, 0.7);
         }
 
         @keyframes textGradient {
@@ -180,8 +181,8 @@
         .subtitle {
             color: #b794f6;
             text-align: center;
-            margin-bottom: 45px;
-            font-size: 18px;
+            margin-bottom: 30px;
+            font-size: 14px;
             font-weight: 400;
             letter-spacing: 1px;
             animation: subtitleGlow 2s ease-in-out infinite alternate;
@@ -189,13 +190,13 @@
 
         @keyframes subtitleGlow {
             from { text-shadow: 0 0 5px rgba(183, 148, 246, 0.5); }
-            to { text-shadow: 0 0 20px rgba(183, 148, 246, 0.8); }
+            to { text-shadow: 0 0 15px rgba(183, 148, 246, 0.8); }
         }
 
         form {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 20px;
         }
 
         .input-group {
@@ -205,9 +206,9 @@
         .input-label {
             display: block;
             color: #e2e8f0;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
@@ -217,12 +218,12 @@
             width: 100%;
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid rgba(255, 20, 147, 0.3);
-            border-radius: 20px;
-            padding: 20px 25px;
-            font-size: 18px;
+            border-radius: 15px;
+            padding: 15px 18px;
+            font-size: 16px;
             font-weight: 500;
             color: #ffffff;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
             font-family: 'Poppins', sans-serif;
             position: relative;
@@ -232,10 +233,10 @@
         input[type="password"]:focus {
             border-color: #ff1493;
             box-shadow: 
-                0 0 0 4px rgba(255, 20, 147, 0.2),
-                0 0 30px rgba(255, 20, 147, 0.4),
-                inset 0 0 20px rgba(255, 20, 147, 0.1);
-            transform: translateY(-3px) scale(1.02);
+                0 0 0 3px rgba(255, 20, 147, 0.2),
+                0 0 20px rgba(255, 20, 147, 0.4),
+                inset 0 0 15px rgba(255, 20, 147, 0.1);
+            transform: translateY(-2px) scale(1.02);
             background: rgba(0, 0, 0, 0.9);
         }
 
@@ -253,7 +254,7 @@
             width: 0;
             height: 2px;
             background: linear-gradient(90deg, #ff1493, #8a2be2);
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
             transform: translateX(-50%);
         }
 
@@ -265,18 +266,18 @@
             background: linear-gradient(135deg, #ff1493 0%, #8a2be2 50%, #ff69b4 100%);
             background-size: 200% 200%;
             border: none;
-            border-radius: 20px;
-            padding: 22px 30px;
-            font-size: 20px;
+            border-radius: 15px;
+            padding: 16px 25px;
+            font-size: 16px;
             font-weight: 700;
             color: white;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 
-                0 8px 25px rgba(255, 20, 147, 0.4),
-                0 0 50px rgba(255, 20, 147, 0.2);
+                0 6px 20px rgba(255, 20, 147, 0.4),
+                0 0 30px rgba(255, 20, 147, 0.2);
             font-family: 'Poppins', sans-serif;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             position: relative;
             overflow: hidden;
@@ -284,9 +285,9 @@
         }
 
         @keyframes buttonPulse {
-            0% { box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4), 0 0 50px rgba(255, 20, 147, 0.2); }
-            50% { box-shadow: 0 12px 35px rgba(255, 20, 147, 0.6), 0 0 70px rgba(255, 20, 147, 0.4); }
-            100% { box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4), 0 0 50px rgba(255, 20, 147, 0.2); }
+            0% { box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4), 0 0 30px rgba(255, 20, 147, 0.2); }
+            50% { box-shadow: 0 8px 25px rgba(255, 20, 147, 0.6), 0 0 40px rgba(255, 20, 147, 0.4); }
+            100% { box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4), 0 0 30px rgba(255, 20, 147, 0.2); }
         }
 
         button[type="submit"]::before {
@@ -297,15 +298,15 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.6s;
+            transition: left 0.5s;
         }
 
         button[type="submit"]:hover {
             background-position: 100% 100%;
-            transform: translateY(-5px) scale(1.05);
+            transform: translateY(-3px) scale(1.02);
             box-shadow: 
-                0 15px 40px rgba(255, 20, 147, 0.6),
-                0 0 80px rgba(255, 20, 147, 0.4);
+                0 10px 30px rgba(255, 20, 147, 0.6),
+                0 0 50px rgba(255, 20, 147, 0.4);
         }
 
         button[type="submit"]:hover::before {
@@ -313,30 +314,30 @@
         }
 
         button[type="submit"]:active {
-            transform: translateY(-2px) scale(1.02);
+            transform: translateY(-1px) scale(1.01);
         }
 
         .error-messages {
-            margin-top: 25px;
+            margin-top: 20px;
         }
 
         .error-message {
             background: rgba(220, 38, 38, 0.1);
             border: 2px solid rgba(220, 38, 38, 0.5);
-            border-radius: 15px;
-            padding: 15px 20px;
+            border-radius: 12px;
+            padding: 12px 15px;
             color: #ff6b6b;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             animation: errorShake 0.6s ease-in-out;
             backdrop-filter: blur(10px);
         }
 
         @keyframes errorShake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         .particles {
@@ -348,8 +349,8 @@
 
         .particle {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 3px;
+            height: 3px;
             background: #ff1493;
             border-radius: 50%;
             animation: particleFloat 6s infinite;
@@ -384,36 +385,130 @@
             }
         }
 
-        @media (max-width: 768px) {
+        /* Mobile Specific Optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
             .login-container {
-                padding: 40px 30px;
-                margin: 20px;
-                max-width: 420px;
+                padding: 20px 15px;
+                max-width: 320px;
+                border-radius: 18px;
+            }
+            
+            .logo-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+                margin-bottom: 12px;
             }
             
             h2 {
-                font-size: 36px;
+                font-size: 24px;
+                letter-spacing: 1px;
+            }
+            
+            .subtitle {
+                font-size: 12px;
+                margin-bottom: 25px;
+            }
+            
+            form {
+                gap: 18px;
+            }
+            
+            .input-label {
+                font-size: 11px;
+                margin-bottom: 6px;
             }
             
             input[type="email"],
             input[type="password"] {
-                padding: 18px 20px;
-                font-size: 16px;
+                padding: 13px 15px;
+                font-size: 15px;
+                border-radius: 12px;
             }
             
             button[type="submit"] {
-                padding: 20px 25px;
-                font-size: 18px;
+                padding: 14px 20px;
+                font-size: 14px;
+                border-radius: 12px;
+            }
+            
+            .error-message {
+                padding: 10px 12px;
+                font-size: 13px;
+                border-radius: 10px;
+            }
+            
+            .cyber-grid {
+                background-size: 25px 25px;
             }
         }
 
-        @media (max-width: 480px) {
+        /* Ultra Small Screens */
+        @media (max-width: 320px) {
             .login-container {
-                padding: 35px 25px;
+                padding: 18px 12px;
+                max-width: 300px;
             }
             
             h2 {
-                font-size: 32px;
+                font-size: 22px;
+            }
+            
+            input[type="email"],
+            input[type="password"] {
+                padding: 12px 13px;
+                font-size: 14px;
+            }
+            
+            button[type="submit"] {
+                padding: 13px 18px;
+                font-size: 13px;
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .login-container {
+                padding: 15px;
+                max-width: 400px;
+            }
+            
+            .logo-section {
+                margin-bottom: 15px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+            
+            h2 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+            
+            .subtitle {
+                font-size: 11px;
+                margin-bottom: 15px;
+            }
+            
+            form {
+                gap: 15px;
+            }
+            
+            input[type="email"],
+            input[type="password"] {
+                padding: 10px 12px;
+            }
+            
+            button[type="submit"] {
+                padding: 12px 15px;
             }
         }
     </style>
