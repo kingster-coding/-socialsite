@@ -1,0 +1,906 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Reels - Futuristic Instagram Clone</title>
+    {% block content %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+        }
+
+        .header h2 {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(255, 20, 147, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(255, 20, 147, 0.5);
+        }
+
+        .upload-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .upload-form {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(30, 10, 30, 0.95));
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .upload-form h3 {
+            color: #ff69b4;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ff69b4;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Reels Container */
+        .reels-container {
+            margin-top: 100px;
+            height: calc(100vh - 100px);
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+
+        .reels-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Individual Reel */
+        .reel-item {
+            position: relative;
+            height: calc(100vh - 100px);
+            scroll-snap-align: start;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .reel-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Reel Overlay */
+        .reel-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 30px 20px 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        .username {
+            font-weight: 600;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .follow-btn-inline {
+            background: transparent;
+            border: 1px solid #ff69b4;
+            color: #ff69b4;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .follow-btn-inline:hover,
+        .follow-btn-inline.following {
+            background: #ff69b4;
+            color: white;
+        }
+
+        .reel-caption {
+            color: white;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        /* Side Actions */
+        .side-actions {
+            position: absolute;
+            right: 20px;
+            bottom: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 105, 180, 0.3);
+            transform: scale(1.1);
+        }
+
+        .action-btn.liked {
+            background: #ff1493;
+        }
+
+        .action-count {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 5px;
+            color: white;
+        }
+
+        /* Comment Section */
+        .comment-section {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(30, 10, 30, 0.98));
+            backdrop-filter: blur(20px);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.4s ease;
+            z-index: 1500;
+        }
+
+        .comment-section.active {
+            bottom: 0;
+        }
+
+        .comment-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .comment-header h3 {
+            color: #ff69b4;
+        }
+
+        .comment-close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: none;
+            border: none;
+            color: #ff69b4;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .comments-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .comment-item {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-user {
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 5px;
+        }
+
+        .comment-text {
+            color: white;
+            line-height: 1.4;
+        }
+
+        .comment-input-section {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 105, 180, 0.2);
+        }
+
+        .comment-input-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 25px;
+            color: white;
+        }
+
+        .comment-submit {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Share Modal */
+        .share-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(30, 10, 30, 0.98));
+            backdrop-filter: blur(20px);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            transition: all 0.4s ease;
+            z-index: 1500;
+        }
+
+        .share-modal.active {
+            bottom: 0;
+        }
+
+        .share-options {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .share-option:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .share-option-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .upload-section {
+                right: 15px;
+                top: 70px;
+            }
+
+            .upload-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .side-actions {
+                right: 15px;
+                bottom: 120px;
+            }
+
+            .action-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+
+            .share-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 105, 180, 0.3);
+            border-top: 3px solid #ff69b4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 100;
+        }
+
+        .scroll-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-dot.active {
+            background: #ff69b4;
+            transform: scale(1.3);
+        }
+    </style>
+<!-- Upload Button -->
+<div class="upload-section">
+    <button class="upload-btn" onclick="openUploadModal()">➕</button>
+</div>
+
+<!-- Upload Modal -->
+<div class="upload-modal" id="uploadModal">
+    <div class="upload-form">
+        <button class="close-btn" onclick="closeUploadModal()">✕</button>
+        <h3>➕ Upload a Reel</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="video">Video (Max 1 min):</label>
+                <input type="file" name="video" accept="video/mp4" required>
+            </div>
+            <div class="form-group">
+                <label for="caption">Caption:</label>
+                <textarea name="caption" rows="3" placeholder="Write a caption..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Upload Reel</button>
+        </form>
+    </div>
+</div>
+
+<!-- Reels Container -->
+<div class="reels-container" id="reelsContainer">
+    {% for reel in reels %}
+    <div class="reel-item">
+        <video class="reel-video" src="{{ reel.video.url }}" loop></video>
+
+        <div class="reel-overlay">
+            <div class="user-info">
+                <div class="user-avatar">{{ reel.user.username|first|upper }}</div>
+                <span class="username">@{{ reel.user.username }}</span>
+                <button class="follow-btn-inline" onclick="toggleFollow(this)">Follow</button>
+            </div>
+            <div class="reel-caption">{{ reel.caption }}</div>
+        </div>
+
+        <div class="side-actions">
+            <div>
+                <button class="action-btn" onclick="toggleLike(this)">❤️</button>
+                <div class="action-count">{{ reel.likes.count }}</div>
+            </div>
+            <div>
+                <button class="action-btn" onclick="openComments()">💬</button>
+                <div class="action-count">{{ reel.comments.count }}</div>
+            </div>
+            <div>
+                <button class="action-btn" onclick="openShareModal()">📤</button>
+                <div class="action-count">Share</div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p style="text-align: center; color: white; padding-top: 100px;">No reels found. Upload one to get started!</p>
+    {% endfor %}
+
+    <!-- Loading indicator for infinite scroll -->
+    <div class="loading" id="loadingIndicator" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<!-- Scroll Indicators -->
+<div class="scroll-indicator" id="scrollIndicator">
+    <!-- Will be populated by JS -->
+</div>
+
+<!-- Comment Section -->
+<div class="comment-section" id="commentSection">
+    <div class="comment-header">
+        <h3>Comments</h3>
+        <button class="comment-close" onclick="closeComments()">✕</button>
+    </div>
+    <div class="comments-list">
+        <!-- Dynamically load comments via backend or JS -->
+    </div>
+    <div class="comment-input-section">
+        <form class="comment-input-form" method="post" action="#">
+            {% csrf_token %}
+            <input type="text" class="comment-input" name="comment" placeholder="Add a comment..." />
+            <button type="submit" class="comment-submit">Post</button>
+        </form>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="share-modal" id="shareModal">
+    <div class="comment-header">
+        <h3>Share</h3>
+        <button class="comment-close" onclick="closeShareModal()">✕</button>
+    </div>
+    <div class="share-options">
+        <div class="share-option" onclick="shareToWhatsApp()">
+            <div class="share-option-icon">📱</div>
+            <div>WhatsApp</div>
+        </div>
+        <div class="share-option" onclick="shareToInstagram()">
+            <div class="share-option-icon">📷</div>
+            <div>Instagram</div>
+        </div>
+        <div class="share-option" onclick="shareToFacebook()">
+            <div class="share-option-icon">📘</div>
+            <div>Facebook</div>
+        </div>
+        <div class="share-option" onclick="shareToTwitter()">
+            <div class="share-option-icon">🐦</div>
+            <div>Twitter</div>
+        </div>
+        <div class="share-option" onclick="copyLink()">
+            <div class="share-option-icon">🔗</div>
+            <div>Copy Link</div>
+        </div>
+        <div class="share-option" onclick="shareViaEmail()">
+            <div class="share-option-icon">📧</div>
+            <div>Email</div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        let currentReelIndex = 0;
+        let isLoading = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const reelsContainer = document.getElementById('reelsContainer');
+            const videos = document.querySelectorAll('.reel-video');
+            
+            // Auto-play first video
+            if (videos.length > 0) {
+                videos[0].play();
+            }
+
+            // Handle scroll for reel navigation
+            reelsContainer.addEventListener('scroll', handleScroll);
+            
+            // Handle keyboard navigation
+            document.addEventListener('keydown', handleKeyNavigation);
+            
+            // Update scroll indicators
+            updateScrollIndicators();
+        });
+
+        // Handle scroll events
+        function handleScroll() {
+            const container = document.getElementById('reelsContainer');
+            const reels = document.querySelectorAll('.reel-item');
+            const containerHeight = container.clientHeight;
+            const scrollTop = container.scrollTop;
+            
+            // Calculate current reel index
+            const newIndex = Math.round(scrollTop / containerHeight);
+            
+            if (newIndex !== currentReelIndex) {
+                // Pause previous video
+                const prevVideo = reels[currentReelIndex]?.querySelector('.reel-video');
+                if (prevVideo) prevVideo.pause();
+                
+                // Play current video
+                currentReelIndex = newIndex;
+                const currentVideo = reels[currentReelIndex]?.querySelector('.reel-video');
+                if (currentVideo) currentVideo.play();
+                
+                updateScrollIndicators();
+            }
+
+            // Infinite scroll - load more reels when near bottom
+            if (scrollTop + containerHeight >= container.scrollHeight - 100) {
+                loadMoreReels();
+            }
+        }
+
+        // Handle keyboard navigation
+        function handleKeyNavigation(e) {
+            if (e.code === 'ArrowUp') {
+                e.preventDefault();
+                scrollToReel(Math.max(0, currentReelIndex - 1));
+            } else if (e.code === 'ArrowDown') {
+                e.preventDefault();
+                const reels = document.querySelectorAll('.reel-item');
+                scrollToReel(Math.min(reels.length - 1, currentReelIndex + 1));
+            } else if (e.code === 'Space') {
+                e.preventDefault();
+                toggleVideoPlayback();
+            }
+        }
+
+        // Scroll to specific reel
+        function scrollToReel(index) {
+            const container = document.getElementById('reelsContainer');
+            const containerHeight = container.clientHeight;
+            container.scrollTo({
+                top: index * containerHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // Toggle video playback
+        function toggleVideoPlayback() {
+            const reels = document.querySelectorAll('.reel-item');
+            const currentVideo = reels[currentReelIndex]?.querySelector('.reel-video');
+            if (currentVideo) {
+                if (currentVideo.paused) {
+                    currentVideo.play();
+                } else {
+                    currentVideo.pause();
+                }
+            }
+        }
+
+        // Update scroll indicators
+        function updateScrollIndicators() {
+            const dots = document.querySelectorAll('.scroll-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentReelIndex);
+            });
+        }
+
+        // Load more reels (infinite scroll)
+        function loadMoreReels() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'flex';
+
+            // Simulate API call
+            setTimeout(() => {
+                const container = document.getElementById('reelsContainer');
+                const newReels = createSampleReels(3);
+                
+                newReels.forEach(reel => {
+                    container.insertBefore(reel, loadingIndicator);
+                });
+
+                isLoading = false;
+                loadingIndicator.style.display = 'none';
+                
+                // Update scroll indicators
+                const totalReels = document.querySelectorAll('.reel-item').length;
+                updateScrollIndicatorDots(totalReels);
+            }, 1500);
+        }
+
+        // Create sample reels for infinite scroll
+        function createSampleReels(count) {
+            const reels = [];
+            const sampleUsers = ['@newuser1', '@creator2', '@viral3'];
+            const sampleCaptions = [
+                'New trending reel! 🔥 #trending',
+                'Amazing moment captured! ✨ #moments',
+                'Check out this cool trick! 🎯 #skills'
+            ];
+
+            for (let i = 0; i < count; i++) {
+                const reel = document.createElement('div');
+                reel.className = 'reel-item';
+                reel.innerHTML = `
+                    <video class="reel-video" src="https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4" muted loop></video>
+                    
+                    <div class="reel-overlay">
+                        <div class="user-info">
+                            <div class="user-avatar">N${i+1}</div>
+                            <span class="username">${sampleUsers[i]}</span>
+                            <button class="follow-btn-inline" onclick="toggleFollow(this)">Follow</button>
+                        </div>
+                        <div class="reel-caption">${sampleCaptions[i]}</div>
+                    </div>
+
+                    <div class="side-actions">
+                        <div>
+                            <button class="action-btn" onclick="toggleLike(this)">❤️</button>
+                            <div class="action-count">${Math.floor(Math.random() * 1000) + 100}</div>
+                        </div>
+                        <div>
+                            <button class="action-btn" onclick="openComments()">💬</button>
+                            <div class="action-count">${Math.floor(Math.random() * 100) + 10}</div>
+                        </div>
+                        <div>
+                            <button class="action-btn" onclick="openShareModal()">📤</button>
+                            <div class="action-count">Share</div>
+                        </div>
+                        <div>
+                                                        <button class="action-btn">🎵</button>
+                            <div class="action-count">Audio</div>
+                        </div>
+                    </div>
+                `;
+                reels.push(reel);
+            }
+
+            return reels;
+        }
+
+        // Update scroll dots based on reel count
+        function updateScrollIndicatorDots(count) {
+            const indicator = document.getElementById('scrollIndicator');
+            indicator.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'scroll-dot';
+                if (i === currentReelIndex) dot.classList.add('active');
+                indicator.appendChild(dot);
+            }
+        }
+
+        // Upload Modal functions
+        function openUploadModal() {
+            document.getElementById('uploadModal').style.display = 'flex';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+        }
+
+        // Comment Modal functions
+        function openComments() {
+            document.getElementById('commentSection').classList.add('active');
+        }   
+
+
+        function closeComments() {
+            document.getElementById('commentSection').classList.remove('active');
+        }   
+
+
+        // Share Modal functions
+       function openShareModal() {
+            document.getElementById('shareModal').classList.add('active');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+
+        function toggleFollow(btn) {
+            if (btn.innerText === "Follow") {
+                btn.innerText = "Following";
+                btn.classList.add("following");
+            } else {
+                btn.innerText = "Follow";
+                btn.classList.remove("following");
+            }
+        }
+
+        function toggleLike(btn) {
+            btn.classList.toggle('liked');
+            const countEl = btn.nextElementSibling;
+            let count = parseInt(countEl.innerText.replace('K', '000').replace(/\D/g, '')) || 0;
+            if (btn.classList.contains('liked')) {
+                count++;
+            } else {
+                count = Math.max(count - 1, 0);
+            }
+            countEl.innerText = count >= 1000 ? (count / 1000).toFixed(1) + 'K' : count;
+        }
+
+        // Dummy share functions
+        function shareToWhatsApp() {
+            alert("Shared to WhatsApp!");
+        }
+
+        function shareToInstagram() {
+            alert("Shared to Instagram!");
+        }
+
+        function shareToFacebook() {
+            alert("Shared to Facebook!");
+        }
+
+        function shareToTwitter() {
+            alert("Shared to Twitter!");
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link copied to clipboard!");
+        }
+
+        function shareViaEmail() {
+            window.location.href = `mailto:?subject=Check out this reel&body=${window.location.href}`;
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

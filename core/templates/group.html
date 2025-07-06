@@ -1,0 +1,496 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Groups</title>
+    {% block content %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 1px solid #ff006e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #ff006e;
+            text-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .section {
+            background: linear-gradient(135deg, #1a1a1a, #252525);
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .section-header {
+            background: #222;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        .section-header h2 {
+            color: #ff006e;
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        /* Create Group Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ff006e;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #ff006e, #c2185b);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 0, 110, 0.3);
+        }
+        
+        /* Groups Grid */
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .group-item {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .group-item:hover {
+            border-color: #ff006e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .group-name {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .group-privacy {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+        }
+        
+        .privacy-public { background: #1a472a; color: #4ade80; }
+        .privacy-private { background: #4c1d1d; color: #f87171; }
+        .privacy-hidden { background: #312e81; color: #a78bfa; }
+        
+        .group-description {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .group-actions {
+            text-align: right;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Group Detail */
+        .group-detail-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .group-info h2 {
+            color: #ff006e;
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .group-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .members-count {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .group-actions-panel {
+            text-align: center;
+        }
+        
+        /* Posts Section */
+        .posts-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        
+        .post-item {
+            background: #1f1f1f;
+            border-left: 3px solid #ff006e;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .post-author {
+            color: #ff006e;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .post-date {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        
+        .post-content {
+            color: #ddd;
+            margin-bottom: 0.8rem;
+        }
+        
+        .post-media img, .post-media video {
+            max-width: 100%;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .post-file {
+            display: inline-block;
+            color: #ff006e;
+            text-decoration: none;
+            padding: 0.3rem 0.8rem;
+            background: #2a2a2a;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .post-file:hover {
+            background: #333;
+        }
+        
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            color: #888;
+            padding: 2rem;
+            font-style: italic;
+        }
+        
+        /* Special Buttons */
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .group-detail-grid { grid-template-columns: 1fr; }
+            .groups-container { grid-template-columns: 1fr; }
+            header h1 { font-size: 2rem; }
+        }
+        
+        /* Custom Scrollbar */
+        .posts-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .posts-container::-webkit-scrollbar-track {
+            background: #333;
+        }
+        
+        .posts-container::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- CREATE GROUP SECTION -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Create New Group</h2>
+            </div>
+            <div class="section-content">
+                <form method="POST" enctype="multipart/form-data" action="{% url 'group_create' %}">
+                    {% csrf_token %}
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <input type="text" name="name" placeholder="Group Name" required>
+                        </div>
+                        <div class="form-group">
+                            <select name="privacy">
+                                <option value="public">Public</option>
+                                <option value="private">Private</option>
+                                <option value="hidden">Hidden</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <textarea name="description" placeholder="Group Description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="file" name="cover_photo" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit">Create Group</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ALL GROUPS SECTION -->
+        <div class="section">
+            <div class="section-header">
+                <h2>All Groups ({{ groups|length }})</h2>
+            </div>
+            <div class="section-content">
+                {% if groups %}
+                    <div class="groups-container">
+                        {% for g in groups %}
+                            <div class="group-item">
+                                <div class="group-name">{{ g.name }}</div>
+                                <span class="group-privacy privacy-{{ g.privacy }}">{{ g.privacy|title }}</span>
+                                <p class="group-description">{{ g.description|truncatewords:20 }}</p>
+                                <div class="group-actions">
+                                    <form method="get" action="{% url 'group_detail' g.id %}" style="display: inline;">
+                                        <button type="submit" class="btn-small">View Group</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        No groups created yet. Create the first one above!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- GROUP DETAIL SECTION -->
+        {% if group %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Group Details</h2>
+            </div>
+            <div class="section-content">
+                <div class="group-detail-grid">
+                    <div class="group-info">
+                        <h2>{{ group.name }}</h2>
+                        <div class="group-meta">
+                            <span class="group-privacy privacy-{{ group.privacy }}">{{ group.privacy|title }}</span>
+                            <span class="members-count">{{ members|length }} members</span>
+                        </div>
+                        <p class="group-description">{{ group.description }}</p>
+                    </div>
+                    <div class="group-actions-panel">
+                        {% if is_member %}
+                            <form method="post" action="{% url 'group_leave' group.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-danger">Leave Group</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'group_join' group.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-success">Join Group</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- POST FORM SECTION -->
+        {% if is_member %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Create Post</h2>
+            </div>
+            <div class="section-content">
+                <form method="POST" enctype="multipart/form-data" action="{% url 'group_post_create' group.id %}">
+                    {% csrf_token %}
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <textarea name="content" placeholder="What's on your mind?" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="file" name="media_file" accept="image/*,video/*,.pdf,.doc,.docx">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit">Post</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- POSTS SECTION -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Posts ({{ posts|length }})</h2>
+            </div>
+            <div class="section-content">
+                {% if posts %}
+                    <div class="posts-container">
+                        {% for post in posts %}
+                            <div class="post-item">
+                                <div class="post-header">
+                                    <span class="post-author">{{ post.author.username }}</span>
+                                    <span class="post-date">{{ post.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="post-content">{{ post.content }}</div>
+                                {% if post.file_type == 'image' %}
+                                    <div class="post-media">
+                                        <img src="{{ post.media_file.url }}" alt="Image">
+                                    </div>
+                                {% elif post.file_type == 'video' %}
+                                    <div class="post-media">
+                                        <video controls src="{{ post.media_file.url }}"></video>
+                                    </div>
+                                {% elif post.file_type in 'pdf,doc' %}
+                                    <a href="{{ post.media_file.url }}" download class="post-file">{{ post.filename }}</a>
+                                {% else %}
+                                    <a href="{{ post.media_file.url }}" download class="post-file">Download File</a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        No posts yet. Be the first to share something!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% for field in form %}
+    {% for error in field.errors %}
+        <div class="error">{{ error }}</div>
+    {% endfor %}
+{% endfor %}
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-resize textareas
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

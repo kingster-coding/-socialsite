@@ -1,0 +1,188 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ profile_user.get_full_name }} | Profile</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 0;
+            background: #f2f2f2;
+        }
+        .cover-photo {
+            width: 100%;
+            height: 250px;
+            background: #ccc;
+            position: relative;
+        }
+        .cover-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-box {
+            position: relative;
+            text-align: center;
+            background: #fff;
+            margin: -80px auto 0;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .profile-pic img {
+            border-radius: 50%;
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border: 4px solid white;
+            background: white;
+        }
+        .btn {
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            background: royalblue;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .tabs {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            cursor: pointer;
+        }
+        .tab {
+            padding: 10px;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom: 2px solid royalblue;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            margin-top: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .post-box {
+            background: #fff;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .about-table {
+            background: #fff;
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Cover Photo -->
+<div class="cover-photo">
+    {% if profile.cover_photo %}
+        <img src="{{ profile.cover_photo.url }}" alt="Cover Photo">
+    {% endif %}
+</div>
+
+<!-- Profile Box -->
+<div class="profile-box">
+    <div class="profile-pic">
+        {% if profile.profile_pic %}
+            <img src="{{ profile.profile_pic.url }}" alt="Profile Photo">
+        {% else %}
+            <img src="{% static 'default_profile.png' %}" alt="Default">
+        {% endif %}
+    </div>
+    <h2>{{ profile_user.get_full_name }}</h2>
+    <p>@{{ profile_user.username }}</p>
+    <p>{{ profile.bio }}</p>
+    <p>Friends: {{ friend_count }}</p>
+
+    {% if not is_own_profile %}
+        {% if is_friend %}
+            <button class="btn">Friends ✅</button>
+        {% else %}
+            <button class="btn">Add Friend</button>
+        {% endif %}
+        <button class="btn">Message</button>
+    {% endif %}
+
+    {% if is_own_profile %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ profile_form.as_p }}
+            <button class="btn" name="update_profile" type="submit">Save Profile</button>
+        </form>
+    {% endif %}
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('posts')">Posts</div>
+        <div class="tab" onclick="showTab('about')">About</div>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="posts" class="tab-content active">
+        {% if is_own_profile %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ post_form.as_p }}
+            <button class="btn" name="create_post" type="submit">Post</button>
+        </form>
+        {% endif %}
+
+        {% for post in posts %}
+        <div class="post-box">
+            <p><strong>{{ post.user.get_full_name }}</strong> - {{ post.created_at|date:"M d, Y H:i" }}</p>
+            <p>{{ post.content }}</p>
+            {% if post.media %}
+                <p><a href="{{ post.media.url }}" target="_blank">📎 View Attachment</a></p>
+            {% endif %}
+        </div>
+        {% empty %}
+            <p>No posts yet.</p>
+        {% endfor %}
+    </div>
+
+    <div id="about" class="tab-content">
+        <table class="about-table">
+            <tr><td><strong>Full Name:</strong></td><td>{{ profile_user.get_full_name }}</td></tr>
+            <tr><td><strong>Email:</strong></td><td>{{ profile_user.email }}</td></tr>
+            <tr><td><strong>Joined:</strong></td><td>{{ profile_user.date_joined|date:"F Y" }}</td></tr>
+            <tr><td><strong>Skills:</strong></td><td>{{ profile.skills }}</td></tr>
+            <tr><td><strong>Education:</strong></td><td>{{ profile.education }}</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- JS for Tabs -->
+<script>
+    function showTab(tabId) {
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+</script>
+
+</body>
+</html>

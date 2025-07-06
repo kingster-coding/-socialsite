@@ -1,0 +1,869 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% block extra_css %}{% endblock %}
+    <title>Futuristic Social Feed</title>
+
+    {% block content %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(ellipse at center, #0a0a0a 0%, #1a0a1a 40%, #000 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 20, 147, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 20, 147, 0.05) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-20px, -10px) rotate(1deg); }
+            50% { transform: translate(15px, -5px) rotate(-1deg); }
+            75% { transform: translate(-10px, 10px) rotate(0.5deg); }
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            gap: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 25px;
+            min-height: 100vh;
+        }
+
+        .left-sidebar, .right-sidebar {
+            position: sticky;
+            top: 25px;
+            height: fit-content;
+        }
+
+        .center-feed {
+            min-height: 100vh;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Futuristic Sidebar Styles */
+        .sidebar-section {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(42, 26, 42, 0.95));
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 0 1px rgba(255, 20, 147, 0.3);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff1493, #ff69b4, transparent);
+            animation: borderFlow 3s infinite;
+        }
+
+        @keyframes borderFlow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .sidebar-title {
+            color: #ff69b4;
+            font-weight: 800;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+            position: relative;
+        }
+
+        /* Friend Requests - Fully Functional */
+        .friend-request {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .friend-request::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 20, 147, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .friend-request:hover::before {
+            left: 100%;
+        }
+
+        .friend-request:hover {
+            background: rgba(255, 20, 147, 0.1);
+            transform: translateX(8px) translateY(-2px);
+            border-color: #ff1493;
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+        }
+
+        .friend-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 3px solid #ff1493;
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.4);
+        }
+
+        .friend-info {
+            flex: 1;
+            z-index: 2;
+        }
+
+        .friend-name {
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .mutual-friends {
+            color: #ff69b4;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .accept-btn, .decline-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .accept-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
+        }
+
+        .decline-btn {
+            background: transparent;
+            color: #ff69b4;
+            border: 2px solid #ff1493;
+        }
+
+        .accept-btn:hover, .decline-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4);
+        }
+
+        .decline-btn:hover {
+            background: rgba(255, 20, 147, 0.1);
+        }
+
+        /* Trending Topics - Fully Functional */
+        .trend-item {
+            padding: 15px;
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            border-radius: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 4px solid #ff1493;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trend-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 105, 180, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .trend-item:hover::before {
+            left: 100%;
+        }
+
+        .trend-item:hover {
+            background: rgba(255, 20, 147, 0.15);
+            transform: translateX(8px) translateY(-2px);
+            border-color: #ff69b4;
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+        }
+
+        .trend-rank {
+            color: #ff69b4;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .trend-topic {
+            color: #fff;
+            font-weight: 700;
+            margin: 6px 0;
+            font-size: 1.1rem;
+        }
+
+        .trend-posts {
+            color: #ff69b4;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Compact Stories Section */
+        .stories-section {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(42, 26, 42, 0.95));
+            border: 2px solid rgba(255, 20, 147, 0.3);
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        .stories-container {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 5px 0;
+            scrollbar-width: thin;
+            scrollbar-color: #ff1493 transparent;
+        }
+
+        .stories-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .stories-container::-webkit-scrollbar-track {
+            background: rgba(255, 20, 147, 0.1);
+            border-radius: 10px;
+        }
+
+        .stories-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 10px;
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .story-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .story-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #ff1493;
+            object-fit: cover;
+            margin-bottom: 6px;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.4);
+        }
+
+        .add-story {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px dashed #ff1493;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 20, 147, 0.1);
+            margin-bottom: 6px;
+            font-size: 20px;
+            color: #ff69b4;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .add-story:hover {
+            background: rgba(255, 20, 147, 0.2);
+            transform: scale(1.1);
+        }
+
+        .story-item p {
+            font-size: 0.75rem;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Compact Create Post */
+        .create-post-compact {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(42, 26, 42, 0.95));
+            border: 2px solid rgba(255, 20, 147, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        .post-input-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .user-avatar img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #ff1493;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.4);
+        }
+
+        .post-input-field {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid rgba(255, 20, 147, 0.5);
+            border-radius: 20px;
+            background: rgba(26, 26, 26, 0.9);
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .post-input-field:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.4);
+        }
+
+        .post-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            align-items: center;
+            padding-left: 47px;
+        }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px solid #ff1493;
+            border-radius: 15px;
+            background: transparent;
+            color: #ff69b4;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 20, 147, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .post-btn {
+            padding: 6px 16px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: #000;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            margin-left: auto;
+        }
+
+        .post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+        }
+
+        /* Enhanced Post Feed */
+        .post-box {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(42, 26, 42, 0.95));
+            border: 2px solid rgba(255, 20, 147, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .post-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff1493, #ff69b4, transparent);
+            animation: borderSlide 4s infinite;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes borderSlide {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .post-header {
+            color: #ff69b4;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .post-content {
+            color: #fff;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s ease;
+        }
+
+        .post-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.2);
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .post-actions button {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ff1493;
+            border-radius: 25px;
+            background: transparent;
+            color: #ff69b4;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-actions button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .post-actions button:hover::before {
+            left: 0;
+        }
+
+        .post-actions button:hover {
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.4);
+        }
+
+        .comment-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 20, 147, 0.3);
+        }
+
+        .comment-section form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .comment-section input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 20, 147, 0.5);
+            border-radius: 25px;
+            background: rgba(26, 26, 26, 0.9);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .comment-section input:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
+        }
+
+        .comment-section button {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .comment-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+        }
+
+        .comment-box {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 12px 16px;
+            border-radius: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #ff1493;
+            backdrop-filter: blur(10px);
+        }
+
+        .comment-box b {
+            color: #ff69b4;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 20, 147, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff1493;
+            border-right-color: #ff69b4;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Download Link */
+        a {
+            color: #ff69b4;
+            text-decoration: none;
+            padding: 10px 18px;
+            border: 2px solid #ff1493;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        a:hover {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .main-container {
+                grid-template-columns: 280px 1fr 280px;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+                padding: 20px;
+            }
+            
+            .left-sidebar, .right-sidebar {
+                position: static;
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 15px;
+            }
+            
+            .post-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .comment-section form {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* Success notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.4);
+            animation: slideInDown 0.5s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+<div class="main-container">
+    <!-- Left Sidebar -->
+    <div class="left-sidebar">
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">🤝 Friend Requests</h3>
+            <div id="friendRequests"></div>
+        </div>
+    </div>
+
+    <!-- Center Feed -->
+    <div class="center-feed">
+        <!-- Create Post -->
+        <div class="create-post-compact">
+            <form id="createPostForm" enctype="multipart/form-data" onsubmit="return handlePost(event)">
+                <div class="post-input-row">
+                    <div class="user-avatar">
+                        <img src="https://via.placeholder.com/35x35/ff1493/ffffff?text=U" alt="Your avatar">
+                    </div>
+                    <input type="text" id="postContent" placeholder="What's on your mind?" class="post-input-field">
+                </div>
+                <div class="post-options">
+                    <label for="postImage" class="option-btn">
+                        <span>📷</span> Photo
+                        <input type="file" id="postImage" accept="image/*" style="display: none;">
+                    </label>
+                    <button type="submit" class="post-btn">Post</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Post Feed -->
+        <div id="postFeed"></div>
+
+        <!-- Spinner -->
+        <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">🔥 Trending Topics</h3>
+            <div id="trendingTopics"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Box -->
+<div id="notification" class="notification" style="display: none;"></div>
+
+<script>
+function showNotification(message) {
+    const box = document.getElementById('notification');
+    box.textContent = message;
+    box.style.display = 'block';
+    setTimeout(() => {
+        box.style.display = 'none';
+    }, 3000);
+}
+
+function handlePost(e) {
+    e.preventDefault();
+
+    const content = document.getElementById('postContent').value.trim();
+    const imageInput = document.getElementById('postImage');
+    const image = imageInput.files[0];
+
+    if (!content && !image) {
+        showNotification("Please add content or image.");
+        return false;
+    }
+
+    const postFeed = document.getElementById('postFeed');
+    const postBox = document.createElement('div');
+    postBox.className = 'post-box';
+
+    const imgHtml = image ? `<img src="${URL.createObjectURL(image)}" class="post-image" />` : '';
+
+    postBox.innerHTML = `
+        <div class="post-header">You</div>
+        <div class="post-content">${content}</div>
+        ${imgHtml}
+        <div class="post-actions">
+            <button onclick="toggleLike(this)">👍 Like</button>
+            <button onclick="toggleComment(this)">💬 Comment</button>
+            <button onclick="sharePost(this)">🔁 Share</button>
+        </div>
+        <div class="comment-section" style="display: none;">
+            <form onsubmit="return addComment(event, this)">
+                <input type="text" placeholder="Add a comment..." required />
+                <button type="submit">Post</button>
+            </form>
+            <div class="comments"></div>
+        </div>
+    `;
+
+    postFeed.prepend(postBox);
+
+    document.getElementById('postContent').value = '';
+    imageInput.value = '';
+    showNotification("Post published.");
+    return false;
+}
+
+function toggleLike(btn) {
+    if (btn.classList.contains('liked')) {
+        btn.classList.remove('liked');
+        btn.textContent = '👍 Like';
+    } else {
+        btn.classList.add('liked');
+        btn.textContent = '💖 Liked';
+    }
+}
+
+function toggleComment(btn) {
+    const commentSection = btn.closest('.post-box').querySelector('.comment-section');
+    commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+}
+
+function sharePost(btn) {
+    showNotification("Post shared successfully!");
+}
+
+function addComment(e, form) {
+    e.preventDefault();
+    const input = form.querySelector('input');
+    const text = input.value.trim();
+    if (!text) return false;
+
+    const commentsDiv = form.parentElement.querySelector('.comments');
+    const comment = document.createElement('div');
+    comment.className = 'comment-box';
+    comment.innerHTML = `<b>You:</b> ${text}`;
+    commentsDiv.appendChild(comment);
+
+    input.value = '';
+    return false;
+}
+</script>
+
+{% endblock %}

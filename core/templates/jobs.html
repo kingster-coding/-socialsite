@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs - LinkedIn Style</title>
+    {% block content %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000, #1a0015, #2d001a);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, #0d0d0d, #1a0015);
+            border-right: 2px solid #ff1493;
+            padding: 30px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 20, 147, 0.3);
+        }
+
+        .cyber-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ff1493;
+            text-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+        }
+
+        .nav-item {
+            background: rgba(255, 20, 147, 0.1);
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            color: #ff69b4;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 20, 147, 0.2);
+            transform: translateX(5px);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+            background: linear-gradient(135deg, #0a0a0a, #1a001a);
+        }
+
+        .header-section {
+            background: linear-gradient(90deg, rgba(255, 20, 147, 0.1), rgba(0, 0, 0, 0.7));
+            border-left: 4px solid #ff1493;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .header-section h1 {
+            color: #ffffff;
+            font-size: 1.4rem;
+            margin-bottom: 3px;
+        }
+
+        .header-section p {
+            color: #ff69b4;
+            font-size: 0.85rem;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 20, 147, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section h2 {
+            color: #ff1493;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #ff69b4;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        input, textarea, select {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(255, 20, 147, 0.3);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ff1493;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.3);
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 200px;
+            margin: 20px auto 0;
+            display: block;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+        }
+
+        /* Jobs List */
+        .jobs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .job-item {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(26, 0, 21, 0.6));
+            border-left: 4px solid #ff1493;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .job-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.2);
+            border-left-width: 6px;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .job-title {
+            color: #ffffff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .job-company {
+            color: #ff69b4;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 20px;
+            color: #ff69b4;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .job-meta span {
+            background: rgba(255, 20, 147, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .job-description {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .job-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 20, 147, 0.2);
+        }
+
+        .file-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #ffffff;
+        }
+
+        .apply-btn {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: auto;
+            margin: 0;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed rgba(255, 20, 147, 0.3);
+            border-radius: 15px;
+            color: #ff69b4;
+            font-size: 1.2rem;
+        }
+
+        /* Messages */
+        .messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .message {
+            background: linear-gradient(45deg, rgba(255, 20, 147, 0.9), rgba(255, 105, 180, 0.9));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                height: auto;
+                position: relative;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .job-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .job-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+    <div class="container">
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1 class="cyber-title">Job Portal 2077</h1>
+            </div>
+            <div class="nav-item">📊 Dashboard</div>
+            <div class="nav-item">💼 Post Job</div>
+            <div class="nav-item">📋 Job Listings</div>
+            <div class="nav-item">👥 Applications</div>
+            <div class="nav-item">⚙️ Settings</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            
+            <!-- Header -->
+            <div class="header-section">
+                <h1>Job Management Dashboard</h1>
+                <p>Manage and view all job postings in one place</p>
+            </div>
+            
+            <!-- 🔧 Post Job Form -->
+            <div class="form-section">
+                <h2>Post a New Job</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {% if job_form.errors %}
+                        <div style="color: #ff4d6d; font-weight: 600; margin-bottom: 10px;">
+                            {{ job_form.errors }}
+                        </div>
+                    {% endif %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            {{ job_form.title.label_tag }}
+                            {{ job_form.title }}
+                        </div>
+                        <div class="form-group">
+                            {{ job_form.company.label_tag }}
+                            {{ job_form.company }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            {{ job_form.location.label_tag }}
+                            {{ job_form.location }}
+                        </div>
+                        <div class="form-group">
+                            {{ job_form.salary.label_tag }}
+                            {{ job_form.salary }}
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        {{ job_form.description.label_tag }}
+                        {{ job_form.description }}
+                    </div>
+                    <button type="submit" name="post_job">Post Job</button>
+                </form>
+            </div>
+
+            <!-- 📃 Job Listings -->
+            <div class="jobs-list">
+                {% for job in jobs %}
+                <div class="job-item">
+                    <!-- Header -->
+                    <div class="job-header">
+                        <div>
+                            <h3 class="job-title">{{ job.title }}</h3>
+                            <div class="job-company">{{ job.company }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Meta Info -->
+                    <div class="job-meta">
+                        <span>📍 {{ job.location }}</span>
+                        {% if job.salary %}
+                        <span>💰 {{ job.salary }}</span>
+                        {% endif %}
+                        <span>📅 {{ job.posted_at|date:"d M Y" }}</span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="job-description">
+                        {{ job.description }}
+                    </div>
+
+                    <!-- Apply Form -->
+                    <div class="job-actions">
+                        <form method="POST" enctype="multipart/form-data" 
+                              style="display: flex; gap: 15px; align-items: center; width: 100%;">
+                            {% csrf_token %}
+                            <input type="hidden" name="job_id" value="{{ job.id }}">
+                            {{ application_form.resume }}
+                            <button type="submit" name="apply_job" class="apply-btn">Apply Now</button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <p>No jobs posted yet. Be the first to post a job! 🚀</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- 👥 Applications for Your Jobs -->
+            {% if my_applications %}
+            <div class="form-section">
+                <h2>💼 Applications for Your Jobs</h2>
+                {% for app in my_applications %}
+                    <div class="job-item">
+                        <p>
+                            <strong>{{ app.applicant.username }}</strong> applied to 
+                            <strong>{{ app.job.title }}</strong> on 
+                            {{ app.applied_at|date:"d M Y" }}
+                        </p>
+                        <a href="{{ app.resume.url }}" download class="apply-btn">📄 Download Resume</a>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+        </div> <!-- end main-content -->
+
+    </div> <!-- end container -->
+
+    <!-- ✅ Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</body>
+</html>
+{% endblock %}

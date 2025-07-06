@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | SocialSite</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(140deg, #0f0f0f 0%, #1a0011 30%, #2d1126 60%, #1a0011 90%, #0f0f0f 100%);
+            min-height: 100vh;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Left side illustration area */
+        .left-section {
+            flex: 1;
+            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 25%, #c71585 75%, #8b0082 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .left-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 80% 70%, rgba(0, 0, 0, 0.3) 0%, transparent 60%),
+                radial-gradient(circle at 50% 50%, rgba(255, 20, 147, 0.2) 0%, transparent 80%);
+        }
+
+        .brand-logo {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            z-index: 10;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .illustration {
+            width: 350px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 5;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .illustration-content {
+            text-align: center;
+            color: white;
+        }
+
+        .illustration-icon {
+            font-size: 120px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .illustration-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .illustration-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+            line-height: 1.5;
+            max-width: 250px;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Floating elements */
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: floatUpDown 4s ease-in-out infinite;
+        }
+
+        .floating-1 {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .floating-2 {
+            width: 40px;
+            height: 40px;
+            top: 70%;
+            right: 20%;
+            animation-delay: 2s;
+        }
+
+        .floating-3 {
+            width: 80px;
+            height: 80px;
+            bottom: 25%;
+            left: 25%;
+            animation-delay: 1s;
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.6;
+            }
+            50% { 
+                transform: translateY(-25px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+
+        /* Right section - Form */
+        .right-section {
+            flex: 1;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 36px 32px;
+            border: 1px solid rgba(255, 20, 147, 0.15);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            margin: 20px auto;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff1493, transparent);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        <!-- Messages section - Form header ke baad add karo -->
+{% if messages %}
+    <div class="messages-container" style="margin-bottom: 20px;">
+        {% for message in messages %}
+            <div class="message-item alert-{{ message.tags }}" style="
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                font-size: 14px;
+                font-weight: 500;
+                {% if message.tags == 'error' %}
+                    background: rgba(220, 53, 69, 0.1);
+                    border: 1px solid rgba(220, 53, 69, 0.3);
+                    color: #ff6b6b;
+                {% elif message.tags == 'success' %}
+                    background: rgba(40, 167, 69, 0.1);
+                    border: 1px solid rgba(40, 167, 69, 0.3);
+                    color: #51cf66;
+                {% else %}
+                    background: rgba(255, 193, 7, 0.1);
+                    border: 1px solid rgba(255, 193, 7, 0.3);
+                    color: #ffd43b;
+                {% endif %}
+            ">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+        .form-title {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .form-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            flex: 1;
+            position: relative;
+        }
+
+        .form-group.full-width {
+            flex: none;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: #ff69b4;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"] {
+            width: 100%;
+            height: 52px;
+            padding: 0 16px;
+            background: rgba(40, 40, 40, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #ff1493;
+            background: rgba(50, 50, 50, 0.8);
+            box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.1);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 400;
+        }
+
+        /* File upload styling */
+        .file-upload {
+            position: relative;
+            width: 100%;
+            height: 52px;
+            background: rgba(40, 40, 40, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .file-upload:hover {
+            border-color: #ff1493;
+            background: rgba(50, 50, 50, 0.8);
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-content {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            width: 100%;
+        }
+
+        .file-upload-icon {
+            width: 20px;
+            height: 20px;
+            background: #ff1493;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .file-upload-text {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+        }
+
+        .file-upload.has-file .file-upload-text {
+            color: #ffffff;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 50%, #c71585 100%);
+            border: 2px solid rgba(255, 20, 147, 0.3);
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            margin-top: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            box-shadow: 
+                0 8px 25px rgba(255, 20, 147, 0.25),
+                0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            border-color: #ff69b4;
+            box-shadow: 
+                0 15px 35px rgba(255, 20, 147, 0.4),
+                0 8px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #ff69b4 100%);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 
+                0 8px 20px rgba(255, 20, 147, 0.3),
+                0 4px 10px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .submit-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        /* Decorative elements */
+        .decoration-1 {
+            position: absolute;
+            top: 20%;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255, 20, 147, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .decoration-2 {
+            position: absolute;
+            bottom: 30%;
+            left: -30px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(199, 21, 133, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 4s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .left-section {
+                height: 200px;
+                flex: none;
+            }
+            
+            .illustration {
+                width: 150px;
+                height: 100px;
+            }
+            
+            .right-section {
+                flex: 1;
+                padding: 20px;
+            }
+            
+            .form-container {
+                padding: 32px 24px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .form-group {
+                margin-bottom: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Section -->
+    <div class="left-section">
+        <div class="brand-logo">🚀 SocialSite</div>
+        
+        <!-- Floating elements -->
+        <div class="floating-element floating-1"></div>
+        <div class="floating-element floating-2"></div>
+        <div class="floating-element floating-3"></div>
+        
+        <div class="illustration">
+            <div class="illustration-content">
+                <div class="illustration-icon">🎯</div>
+                <h3 class="illustration-title">Join Our Community</h3>
+                <p class="illustration-subtitle">Connect with amazing people and build your professional network</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Section -->
+    <div class="right-section">
+        <div class="decoration-1"></div>
+        <div class="decoration-2"></div>
+        
+        <div class="form-container">
+            <div class="form-header">
+                <h1 class="form-title">Registration</h1>
+                <p class="form-subtitle">Create your account to get started</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="real_name">Full Name</label>
+                        <input type="text" name="real_name" id="real_name" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" name="phone" id="phone" placeholder="Your phone" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profession">Profession</label>
+                        <input type="text" name="profession" id="profession" placeholder="Your profession" required>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="document">Upload Document</label>
+                    <div class="file-upload" onclick="document.getElementById('document').click()">
+                        <input type="file" name="document" id="document" required>
+                        <div class="file-upload-content">
+                            <div class="file-upload-icon">📄</div>
+                            <span class="file-upload-text">Choose file to upload</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password1">Password</label>
+                        <input type="password" name="password1" id="password1" placeholder="Create password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Confirm Password</label>
+                        <input type="password" name="password2" id="password2" placeholder="Confirm password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // File upload functionality
+        document.getElementById('document').addEventListener('change', function(e) {
+            const fileUpload = document.querySelector('.file-upload');
+            const fileText = document.querySelector('.file-upload-text');
+            
+            if (e.target.files.length > 0) {
+                fileText.textContent = e.target.files[0].name;
+                fileUpload.classList.add('has-file');
+            } else {
+                fileText.textContent = 'Choose file to upload';
+                fileUpload.classList.remove('has-file');
+            }
+        });
+
+        // Form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.style.opacity = '0.8';
+        });
+
+        // Input focus effects
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-1px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+
+          // File upload functionality
+    document.getElementById('document').addEventListener('change', function(e) {
+        const fileUpload = document.querySelector('.file-upload');
+        const fileText = document.querySelector('.file-upload-text');
+        
+        if (e.target.files.length > 0) {
+            fileText.textContent = e.target.files[0].name;
+            fileUpload.classList.add('has-file');
+        } else {
+            fileText.textContent = 'Choose file to upload';
+            fileUpload.classList.remove('has-file');
+        }
+    });
+
+    // Form submission with loading state
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const submitBtn = document.querySelector('.submit-btn');
+        const originalText = submitBtn.textContent;
+        
+        // Show loading state
+        submitBtn.textContent = 'Creating Account...';
+        submitBtn.style.opacity = '0.8';
+        submitBtn.disabled = true;
+        
+        // Form validation
+        const requiredFields = ['real_name', 'phone', 'email', 'profession', 'document', 'password1', 'password2'];
+        let isValid = true;
+        
+        requiredFields.forEach(fieldName => {
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            if (!field.value.trim()) {
+                isValid = false;
+                field.style.borderColor = '#ff6b6b';
+            } else {
+                field.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }
+        });
+        
+        // Password match validation
+        const pass1 = document.querySelector('[name="password1"]').value;
+        const pass2 = document.querySelector('[name="password2"]').value;
+        
+        if (pass1 !== pass2) {
+            isValid = false;
+            document.querySelector('[name="password2"]').style.borderColor = '#ff6b6b';
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            submitBtn.textContent = originalText;
+            submitBtn.style.opacity = '1';
+            submitBtn.disabled = false;
+            return;
+        }
+        
+        // If validation passes, form will submit normally
+        // Django view will handle the redirect
+    });
+
+    // Input focus effects
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateY(-1px)';
+            this.style.borderColor = '#ff1493';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateY(0)';
+            if (this.value.trim()) {
+                this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }
+        });
+        
+        // Real-time validation
+        input.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }
+        });
+    });
+
+    // Auto-hide messages after 5 seconds
+    setTimeout(() => {
+        const messages = document.querySelector('.messages-container');
+        if (messages) {
+            messages.style.transition = 'opacity 0.5s ease';
+            messages.style.opacity = '0';
+            setTimeout(() => {
+                messages.style.display = 'none';
+            }, 500);
+        }
+    }, 5000);
+
+
+
+    </script>
+</body>
+</html>
