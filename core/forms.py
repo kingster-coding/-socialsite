@@ -1,16 +1,8 @@
 from django import forms
 from .models import Post, Comment, Story, Reel
-from .models import ResearchPaper, ResearchComment
+from .models import ResearchPaper
 from .models import Job, JobApplication
 
-
-
-
-
-class ResearchCommentForm(forms.ModelForm):
-    class Meta:
-        model = ResearchComment
-        fields = ['content']
 
 
 class PostForm(forms.ModelForm):
@@ -37,15 +29,27 @@ class ReelForm(forms.ModelForm):
         fields = ['video', 'caption']
 
 
+
 class ResearchPaperForm(forms.ModelForm):
     class Meta:
         model = ResearchPaper
-        fields = ['title', 'abstract', 'pdf_file', 'allow_download']
+        fields = ['title', 'authors', 'email', 'category', 'abstract', 'keywords', 'pdf']
 
-class ResearchCommentForm(forms.ModelForm):
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter research title'}),
+            'authors': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter authors'}),
+            'email': forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'Enter email'}),
+            'category': forms.Select(attrs={'class': 'form-input'}),
+            'abstract': forms.Textarea(attrs={'class': 'form-input', 'placeholder': 'Write abstract', 'rows': 4}),
+            'keywords': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter keywords'}),
+            'pdf': forms.ClearableFileInput(attrs={'class': 'form-input'}),
+        }
+
+class ResearchPaperForm(forms.ModelForm):
+    email = forms.EmailField()  # ✅ if 'email' is not in model
     class Meta:
-        model = ResearchComment
-        fields = ['content']
+        model = ResearchPaper
+        fields = ['title', 'authors', 'email', 'category', 'keywords', 'abstract', 'pdf']
 
 
 

@@ -5,12 +5,19 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from .forms import ResearchPaperForm
+from .models import ResearchPaper
+import json
 import uuid
 import os
 
 from .models import (
     Profile, Post, Comment, Story, Reel,
-    ResearchPaper, ResearchComment, ResearchLike,
+    ResearchPaper,
     Job, JobApplication, Meeting, JoinRequest, Recording,
     Group, GroupMember, GroupPost,
 
@@ -18,7 +25,7 @@ from .models import (
 
 from .forms import (
     PostForm, CommentForm, StoryForm, ReelForm,
-    ResearchPaperForm, ResearchCommentForm,
+    ResearchPaperForm,
     JobForm, JobApplicationForm, 
 )
 
@@ -175,43 +182,79 @@ def reels_view(request):
 
 
 @login_required
-def research_papers_view(request):
+
+
+# ✅ Publish Research Paper (via AJAX)
+@login_required
+def publish_research_paper(request):
     if request.method == 'POST':
-        if 'upload_paper' in request.POST:
-            form = ResearchPaperForm(request.POST, request.FILES)
-            if form.is_valid():
-                paper = form.save(commit=False)
-                paper.author = request.user
-                paper.save()
-                return redirect('research_papers')
+        form = ResearchPaperForm(request.POST, request.FILES)
+        if form.is_valid():
+            research = form.save(commit=False)
+            research.user = request.user
+            research.save()
+            return JsonResponse({
+                'status': 'success',
+                'id': research.id,
+                'title': research.title,
+                'authors': research.authors,
+                'category': research.category,
+                'keywords': research.keywords,
+                'abstract': research.abstract,
+                'pdf_url': research.pdf.url,
+                'likes': research.likes,
+                'views': research.views,
+            })
+        else:
+            print("❌ Form Errors:", form.errors)  # ⚠️ Print error in terminal
+            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
 
-        elif 'comment_submit' in request.POST:
-            paper_id = request.POST.get('paper_id')
-            paper = get_object_or_404(ResearchPaper, id=paper_id)
-            comment_form = ResearchCommentForm(request.POST)
-            if comment_form.is_valid():
-                comment = comment_form.save(commit=False)
-                comment.user = request.user
-                comment.paper = paper
-                comment.save()
-                return redirect('research_papers')
+    else:
+        form = ResearchPaperForm()
+    return render(request, 'research.html', {'form': form})
 
-        elif 'like_paper' in request.POST:
-            paper_id = request.POST.get('paper_id')
-            paper = get_object_or_404(ResearchPaper, id=paper_id)
-            existing = ResearchLike.objects.filter(paper=paper, user=request.user)
-            if not existing.exists():
-                ResearchLike.objects.create(paper=paper, user=request.user)
-            return redirect('research_papers')
 
-    papers = ResearchPaper.objects.all().order_by('-created_at')
-    upload_form = ResearchPaperForm()
-    comment_form = ResearchCommentForm()
-    return render(request, 'research_papers.html', {
-        'papers': papers,
-        'upload_form': upload_form,
-        'comment_form': comment_form
-    })
+
+# ✅ Increment View Count
+@csrf_exempt
+def increment_view(request, id):
+    if request.method == 'POST':
+        try:
+            paper = ResearchPaper.objects.get(id=id)
+            paper.views += 1
+            paper.save()
+            return JsonResponse({'views': paper.views})
+        except ResearchPaper.DoesNotExist:
+            return JsonResponse({'error': 'Paper not found'}, status=404)
+
+
+# ✅ Like Research Paper
+@csrf_exempt
+def like_paper(request, id):
+    if request.method == 'POST':
+        try:
+            paper = ResearchPaper.objects.get(id=id)
+            paper.likes += 1
+            paper.save()
+            return JsonResponse({'likes': paper.likes})
+        except ResearchPaper.DoesNotExist:
+            return JsonResponse({'error': 'Paper not found'}, status=404)
+
+
+# ✅ Comment on Research Paper
+@csrf_exempt
+def comment_paper(request, id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            comment_text = data.get('comment')
+            # 👇 If you have a comment model, save it like this:
+            # ResearchComment.objects.create(paper_id=id, user=request.user, comment=comment_text)
+
+            print(f'Comment added on paper {id}: {comment_text}')  # For debugging
+            return JsonResponse({'status': 'Comment added'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
 
 
 
@@ -269,26 +312,29 @@ def jobs(request):
 
 
 
-# views.py
+# ✅ Central Go Live Page (no meeting_id required)
+@login_required
+def go_live_page(request):
+    return render(request, 'go_live.html')
 
 
-# ✅ Create a new meeting and return meeting_id (for AJAX)
+# ✅ Create a new meeting and return meeting_id (AJAX)
 @login_required
 def create_meeting(request):
     meeting = Meeting.objects.create(host=request.user)
     return JsonResponse({'meeting_id': str(meeting.meeting_id)})
 
 
-# ✅ Auto-redirect to live room after creating a meeting (for href use)
+# ✅ Redirect to UUID-based live room after creation (optional use)
 @login_required
 def live_redirect(request):
     meeting = Meeting.objects.create(host=request.user)
     return redirect('go_live_room', meeting_id=meeting.meeting_id)
 
 
-# ✅ Go live page (room with UUID)
+# ✅ UUID-based Go Live Room (optional if not using separate room views)
 @login_required
-def go_live(request, meeting_id):
+def go_live_room(request, meeting_id):
     meeting = get_object_or_404(Meeting, meeting_id=meeting_id)
     return render(request, 'go_live.html', {
         'meeting_id': meeting_id,
@@ -479,3 +525,8 @@ def profile(request, username):
         'profile': profile
     }
     return render(request, 'profile.html', context)
+
+
+
+def research_view(request):
+    return render(request, 'research.html')

@@ -90,28 +90,32 @@ class Follow(models.Model):
 
 
 
-
 class ResearchPaper(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
+    CATEGORY_CHOICES = [
+        ('ai', 'Artificial Intelligence'),
+        ('ml', 'Machine Learning'),
+        ('cs', 'Computer Science'),
+        ('bio', 'Biology'),
+        ('physics', 'Physics'),
+        ('chemistry', 'Chemistry'),
+        ('math', 'Mathematics'),
+        ('engineering', 'Engineering'),
+        ('medicine', 'Medicine'),
+        ('psychology', 'Psychology'),
+    ]
+
+    title = models.CharField(max_length=255)
+    authors = models.CharField(max_length=255)
+    email = models.EmailField()
+    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     abstract = models.TextField()
-    pdf_file = models.FileField(upload_to='research_papers/')
-    allow_download = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    keywords = models.CharField(max_length=255, blank=True)
+    pdf = models.FileField(upload_to='research_papers/')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
-
-class ResearchComment(models.Model):
-    paper = models.ForeignKey(ResearchPaper, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class ResearchLike(models.Model):
-    paper = models.ForeignKey(ResearchPaper, on_delete=models.CASCADE, related_name='likes')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
 
 
 

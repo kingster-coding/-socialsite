@@ -1,0 +1,827 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block content %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Portal | Future Publishing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1e1e3f 50%, #2a2a5a 100%);
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 20%, rgba(255, 20, 147, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(30, 144, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 60%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Futuristic particles */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, #ff1493, #1e90ff);
+            border-radius: 50%;
+            animation: particle-float 6s linear infinite;
+        }
+
+        @keyframes particle-float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ff1493 0%, #1e90ff 100%);
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.1) 10px,
+                rgba(255, 255, 255, 0.1) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(100px); }
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            padding: 0 2rem;
+        }
+
+        .header-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+            to { text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 40px rgba(30, 144, 255, 0.3); }
+        }
+
+        .header-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Dashboard layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Glass morphism panels */
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff1493, #1e90ff, #ff1493);
+            background-size: 200% 100%;
+            animation: gradient-flow 3s linear infinite;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.2);
+        }
+
+        /* Form styles */
+        .form-section {
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #ff1493, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-field {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff1493;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-label {
+            position: absolute;
+            top: 50%;
+            left: 1.5rem;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #ff1493, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label {
+            top: -10px;
+            left: 1rem;
+            font-size: 0.8rem;
+            background: #0f0f23;
+            -webkit-text-fill-color: #ff1493;
+            padding: 0 0.5rem;
+            border-radius: 5px;
+        }
+
+        .form-input::placeholder {
+            color: transparent;
+        }
+
+        /* File upload area */
+        .upload-area {
+            border: 2px dashed rgba(255, 20, 147, 0.5);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #ff1493;
+            background: rgba(255, 20, 147, 0.05);
+        }
+
+        .upload-area.drag-over {
+            border-color: #1e90ff;
+            background: rgba(30, 144, 255, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ff1493, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .upload-subtext {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #ff1493, #1e90ff);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 20, 147, 0.4);
+        }
+
+        /* Papers display */
+        .papers-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .papers-grid {
+            display: grid;
+            gap: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .papers-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .papers-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .papers-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff1493, #1e90ff);
+            border-radius: 10px;
+        }
+
+        .paper-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border-left: 4px solid transparent;
+            background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)),
+                             linear-gradient(135deg, #ff1493, #1e90ff);
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .paper-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.2);
+        }
+
+        .paper-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .paper-meta {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .paper-abstract {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .paper-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 20, 147, 0.2);
+            border-color: #ff1493;
+        }
+
+        /* Statistics */
+        .stats-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(30, 144, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff1493, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        /* Search bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e90ff;
+            box-shadow: 0 0 20px rgba(30, 144, 255, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1e90ff;
+            font-size: 1.2rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .header-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem 1rem;
+            }
+            
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .panel {
+                padding: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #ff1493;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success message */
+        .success-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ff1493, #1e90ff);
+            padding: 2rem;
+            border-radius: 20px;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            display: none;
+        }
+
+        .success-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+    <!-- Background animation -->
+    <div class="bg-animation"></div>
+    <div class="particles"></div>
+
+    <!-- Main content -->
+    <div class="container">
+        <div class="dashboard">
+            <!-- Publishing form -->
+            <div class="panel form-section">
+                <h2 class="section-title">📚 Publish Your Research</h2>
+                <form id="publishForm" class="form-grid" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-field">
+                        <input type="text" id="title" name="title" class="form-input" placeholder=" " required>
+                        <label class="form-label" for="title">Research Title</label>
+                    </div>
+
+                    <div class="form-field">
+                        <input type="text" id="authors" name="authors" class="form-input" placeholder=" " required>
+                        <label class="form-label" for="authors">Authors</label>
+                    </div>
+
+                    <div class="form-field">
+                        <input type="email" id="email" name="email" class="form-input" placeholder=" " required>
+                        <label class="form-label" for="email">Contact Email</label>
+                    </div>
+
+                    <div class="form-field">
+                        <select id="category" name="category" class="form-input" required>
+                            <option value="">Select Research Category</option>
+                            <option value="ai">🤖 Artificial Intelligence</option>
+                            <option value="ml">🧠 Machine Learning</option>
+                            <option value="cs">💻 Computer Science</option>
+                            <option value="bio">🧬 Biology</option>
+                            <option value="physics">⚛️ Physics</option>
+                            <option value="chemistry">🧪 Chemistry</option>
+                            <option value="math">📐 Mathematics</option>
+                            <option value="engineering">⚙️ Engineering</option>
+                            <option value="medicine">🏥 Medicine</option>
+                            <option value="psychology">🧠 Psychology</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <textarea id="abstract" name="abstract" class="form-input" placeholder=" " rows="4" required></textarea>
+                        <label class="form-label" for="abstract">Abstract</label>
+                    </div>
+
+                    <div class="form-field">
+                        <input type="text" id="keywords" name="keywords" class="form-input" placeholder=" ">
+                        <label class="form-label" for="keywords">Keywords</label>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Drag & Drop your PDF here</div>
+                        <div class="upload-subtext">or click to browse files</div>
+                        <input type="file" id="pdfFile" name="pdf" accept=".pdf" style="display: none;" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">✨ Publish Research Paper</button>
+                </form>
+            </div>
+
+            <!-- Papers grid -->
+            <div id="papersGrid" class="papers-grid">
+                <!-- Submitted papers will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Success popup -->
+    <div class="success-popup" id="successPopup">
+        <div class="success-icon">🎉</div>
+        <h3>Research Paper Published Successfully!</h3>
+        <p>Your research is now available to the global scientific community.</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Particle effect (optional)
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // File Upload
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('pdfFile');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateUploadDisplay(files[0]);
+            }
+        });
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length > 0) {
+                updateUploadDisplay(e.target.files[0]);
+            }
+        });
+        function updateUploadDisplay(file) {
+            uploadArea.querySelector('.upload-icon').textContent = '✅';
+            uploadArea.querySelector('.upload-text').textContent = file.name;
+            uploadArea.querySelector('.upload-subtext').textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+        }
+
+        function resetUploadDisplay() {
+            uploadArea.querySelector('.upload-icon').textContent = '📄';
+            uploadArea.querySelector('.upload-text').textContent = 'Drag & Drop your PDF here';
+            uploadArea.querySelector('.upload-subtext').textContent = 'or click to browse files';
+        }
+
+        // Form Submit via AJAX
+        document.getElementById('publishForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const successPopup = document.getElementById('successPopup');
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            loadingOverlay.style.display = 'flex';
+
+            const response = await fetch("{% url 'research' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            });
+
+            loadingOverlay.style.display = 'none';
+
+            if (response.ok) {
+                const data = await response.json();
+                successPopup.style.display = 'block';
+                setTimeout(() => successPopup.style.display = 'none', 3000);
+
+                addNewPaper(data);
+                form.reset();
+                resetUploadDisplay();
+            } else {
+                alert("❌ Failed to publish.");
+            }
+        });
+
+function addNewPaper(data) {
+    const paperItem = document.createElement('div');
+    paperItem.className = 'paper-item';
+    paperItem.innerHTML = `
+        <div class="paper-title">${data.title}</div>
+        <div class="paper-meta">👤 ${data.authors} • 🏷️ ${data.category} • 🔑 ${data.keywords}</div>
+        <div class="paper-abstract">${data.abstract}</div>
+        <div class="paper-actions">
+            <button class="btn-secondary view-btn" data-url="${data.pdf_url}" data-id="${data.id}">👁️ View (${data.views})</button>
+            <a href="${data.pdf_url}" class="btn-secondary" download>📥 Download</a>
+            <button class="btn-secondary like-btn" data-id="${data.id}">❤️ Like (<span class="like-count">${data.likes}</span>)</button>
+            <button class="btn-secondary comment-btn" data-id="${data.id}">💬 Comment</button>
+        </div>
+    `;
+    document.getElementById('papersGrid').prepend(paperItem);
+
+    // View button click → open PDF in new tab + update view count via AJAX
+    paperItem.querySelector('.view-btn').addEventListener('click', function () {
+        const url = this.dataset.url;
+        const id = this.dataset.id;
+        window.open(url, '_blank');
+
+        // Update views in backend
+        fetch(`/research/increment-view/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'Content-Type': 'application/json'
+            }
+        });
+    });
+
+    // Like button click
+    paperItem.querySelector('.like-btn').addEventListener('click', function () {
+        const id = this.dataset.id;
+        const likeCountSpan = this.querySelector('.like-count');
+
+        fetch(`/research/like/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            likeCountSpan.innerText = data.likes;
+        });
+    });
+
+    // Comment button click (popup or inline box)
+    paperItem.querySelector('.comment-btn').addEventListener('click', function () {
+        const id = this.dataset.id;
+        const comment = prompt("Enter your comment:");
+        if (comment) {
+            fetch(`/research/comment/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ comment: comment })
+            }).then(() => alert("Comment added!"));
+        }
+    });
+}
+
+
+        // Init particles (optional)
+        createParticles();
+        
+        function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+    </script>
+</body>
+</html>
+
+{% endblock %}
+
+
+                    

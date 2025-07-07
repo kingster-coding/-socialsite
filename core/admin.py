@@ -3,7 +3,7 @@ from .models import (
     Profile, Follow, FriendRequest,
     Post, Comment, Story,
     Reel, Like, ReelComment,
-    ResearchPaper, ResearchComment, ResearchLike,
+    ResearchPaper,
     Job, JobApplication,
     Meeting, JoinRequest, Recording,
     Group, GroupMember, GroupPost
@@ -20,8 +20,6 @@ admin.site.register(Reel)
 admin.site.register(Like)
 admin.site.register(ReelComment)
 admin.site.register(ResearchPaper)
-admin.site.register(ResearchComment)
-admin.site.register(ResearchLike)
 admin.site.register(Job)
 admin.site.register(JobApplication)
 admin.site.register(Meeting)
@@ -47,3 +45,5 @@ class GroupPostAdmin(admin.ModelAdmin):
     list_display = ('group', 'author', 'file_type', 'created_at')
     list_filter = ('file_type', 'created_at')
     search_fields = ('content', 'author__username', 'group__name')
+
+
