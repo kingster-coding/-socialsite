@@ -6,6 +6,8 @@ urlpatterns = [
     # 🌐 Auth and Landing
     path('', views.landing, name='landing'),
     path('register/', views.register, name='register'),
+    path('send-otp/', views.send_otp_email, name='send_otp_email'),
+    path('verify-otp/', views.verify_otp_email, name='verify_otp_email'),
     path('login/', views.user_login, name='login'),
 
     # 🏠 Home + Feed

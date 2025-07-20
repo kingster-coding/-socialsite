@@ -12,8 +12,17 @@ from django.contrib.auth.decorators import login_required
 from .forms import ResearchPaperForm
 from .models import ResearchPaper
 import json
-import uuid
-import os
+# core/views.py
+
+import random
+from django.core.cache import cache
+from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
+
+
 
 from .models import (
     Profile, Post, Comment, Story, Reel,
@@ -34,9 +43,6 @@ from .forms import (
 def landing(request):
     return render(request, 'landing.html')
 
-
-
-# views.py
 
 # views.py
 
@@ -77,6 +83,58 @@ def register(request):
         return redirect('login')
 
     return render(request, 'register.html')
+
+
+# OTP Generate Function
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+# SEND OTP API
+@csrf_exempt
+def send_otp_email(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        email = data.get('email')
+
+        if not email:
+            return JsonResponse({'status': 'fail', 'message': 'Email is required'}, status=400)
+
+        otp = generate_otp()
+        cache.set(email, otp, timeout=300)  # store for 5 minutes
+
+        try:
+            send_mail(
+                subject='Your OTP Code',
+                message=f'Your OTP code is {otp}',
+                from_email='youremail@gmail.com',  # change if needed
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            return JsonResponse({'status': 'success', 'message': 'OTP sent successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'fail', 'message': 'Failed to send OTP', 'error': str(e)}, status=500)
+
+    return JsonResponse({'status': 'fail', 'message': 'Invalid request method'}, status=405)
+
+# VERIFY OTP API
+@csrf_exempt
+def verify_otp_email(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        email = data.get('email')
+        otp_entered = data.get('otp')
+
+        if not email or not otp_entered:
+            return JsonResponse({'status': 'fail', 'message': 'Email and OTP are required'}, status=400)
+
+        cached_otp = cache.get(email)
+        if cached_otp == otp_entered:
+            return JsonResponse({'status': 'success', 'message': 'OTP verified successfully'})
+        else:
+            return JsonResponse({'status': 'fail', 'message': 'Invalid OTP'}, status=400)
+
+    return JsonResponse({'status': 'fail', 'message': 'Invalid request method'}, status=405)
+
 
 
 def user_login(request):

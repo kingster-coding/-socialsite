@@ -612,8 +612,77 @@
                 min-height: 44px;
             }
         }
+
+
+
+        /* OTP Buttons Style */
+#sendOtpBtn, #resendOtpBtn {
+    background: linear-gradient(135deg, #ff1493 0%, #8a2be2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 20, 147, 0.25);
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    margin-right: 6px;
+}
+
+#sendOtpBtn:hover, #resendOtpBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 20, 147, 0.35);
+}
+
+#sendOtpBtn:active, #resendOtpBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 20, 147, 0.2);
+}
+
+/* Status message styling */
+.otp-status {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.otp-status.success {
+    color: #00ffcc;
+}
+
+.otp-status.error {
+    color: #ff6b6b;
+}
+
+/* Responsive adjustments for OTP buttons */
+@media (max-width: 480px) {
+    #sendOtpBtn, #resendOtpBtn {
+        padding: 9px 12px;
+        font-size: 11px;
+        border-radius: 8px;
+    }
+
+    .otp-status {
+        display: block;
+        margin-left: 0;
+        margin-top: 6px;
+    }
+
+    .otp-button-wrapper {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+}
+
     </style>
-</head>
+<!-- ...head section already present... -->
 <body>
     <div class="cyber-grid"></div>
     
@@ -624,7 +693,7 @@
             <p class="subtitle">Join Our Digital Universe</p>
         </div>
         
-        <form method="post" enctype="multipart/form-data">
+        <form id="registerForm" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             
             <div class="form-row">
@@ -638,27 +707,42 @@
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="input-group">
-                    <label class="input-label">Email Address</label>
-                    <input type="email" name="email" placeholder="Enter your email" required>
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Profession</label>
-                    <input type="text" name="profession" placeholder="Enter your profession" required>
-                </div>
-            </div>
-            
-            <div class="input-group">
-                <label class="input-label">Upload Document</label>
-                <div class="file-input-wrapper">
-                    <input type="file" name="document" id="document" required>
-                    <label for="document" class="file-input-label">
-                        <span class="file-icon">📄</span>
-                        <span class="file-text">Choose Document</span>
-                    </label>
-                </div>
-            </div>
+<div class="form-row">
+    <div class="input-group">
+        <label class="input-label">Email Address</label>
+        <input type="email" name="email" id="email" placeholder="Enter your email" required>
+        <div class="otp-button-wrapper">
+            <button type="button" id="sendOtpBtn">Send OTP</button>
+        </div>
+    </div>
+    <div class="input-group">
+        <label class="input-label">Enter OTP</label>
+        <input type="text" id="otpInput" maxlength="6" placeholder="Enter OTP">
+        <div class="otp-button-wrapper">
+            <button type="button" id="resendOtpBtn">Resend OTP</button>
+            <span id="otpStatus" class="otp-status"></span>
+        </div>
+    </div>
+</div>
+
+
+<div class="form-row">
+    <div class="input-group">
+        <label class="input-label">Profession</label>
+        <input type="text" name="profession" placeholder="Enter your profession" required>
+    </div>
+    <div class="input-group">
+        <label class="input-label">Upload Document</label>
+        <div class="file-input-wrapper">
+            <input type="file" name="document" id="document" required>
+            <label for="document" class="file-input-label">
+                <span class="file-icon">📄</span>
+                <span class="file-text">Choose Document</span>
+            </label>
+        </div>
+    </div>
+</div>
+
             
             <div class="form-row">
                 <div class="input-group">
@@ -688,86 +772,104 @@
     </div>
 
     <script>
-        // File upload functionality
+        let otpVerified = false;
+
+        // Send OTP function
+        function sendOTP() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert("Please enter your email first.");
+                return;
+            }
+
+            fetch('/send-otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const status = document.getElementById('otpStatus');
+                if (data.status === 'success') {
+                    status.innerText = "OTP sent!";
+                    status.className = 'otp-status success';
+                } else {
+                    status.innerText = "Failed to send OTP.";
+                    status.className = 'otp-status error';
+                }
+            });
+        }
+
+        // OTP auto verification
+        document.getElementById('otpInput').addEventListener('input', function () {
+            const otp = this.value;
+            const email = document.getElementById('email').value;
+            if (otp.length === 6) {
+                fetch('/verify-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ email: email, otp: otp })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const status = document.getElementById('otpStatus');
+                    if (data.status === 'success') {
+                        status.innerText = "OTP verified ✅";
+                        status.className = 'otp-status success';
+                        otpVerified = true;
+                    } else {
+                        status.innerText = "Invalid OTP ❌";
+                        status.className = 'otp-status error';
+                        otpVerified = false;
+                    }
+                });
+            }
+        });
+
+        document.getElementById('sendOtpBtn').addEventListener('click', sendOTP);
+        document.getElementById('resendOtpBtn').addEventListener('click', sendOTP);
+
+        // File name display
         document.getElementById('document').addEventListener('change', function(e) {
             const fileText = document.querySelector('.file-text');
-            
             if (e.target.files.length > 0) {
                 const fileName = e.target.files[0].name;
                 const maxLength = window.innerWidth < 360 ? 12 : 16;
                 fileText.textContent = fileName.length > maxLength ? fileName.substring(0, maxLength) + '...' : fileName;
             } else {
-                fileText.textContent = window.innerWidth < 360 ? 'Choose Document' : 'Choose Document';
+                fileText.textContent = 'Choose Document';
             }
         });
 
-        // Form submission with loading state
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const submitBtn = document.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            // Show loading state
-            submitBtn.textContent = 'Creating...';
-            submitBtn.style.opacity = '0.8';
-            submitBtn.disabled = true;
-            
-            // Password validation
+        // Submit block if OTP not verified
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             const password1 = document.querySelector('input[name="password1"]').value;
             const password2 = document.querySelector('input[name="password2"]').value;
-            
+            const submitBtn = document.querySelector('button[type="submit"]');
+
+            if (!otpVerified) {
+                e.preventDefault();
+                alert("Please verify OTP before submitting.");
+                return;
+            }
+
             if (password1 !== password2) {
                 e.preventDefault();
-                alert('Passwords do not match!');
-                submitBtn.textContent = originalText;
-                submitBtn.style.opacity = '1';
+                alert("Passwords do not match!");
                 submitBtn.disabled = false;
                 return;
             }
+
+            submitBtn.textContent = 'Creating...';
+            submitBtn.style.opacity = '0.8';
+            submitBtn.disabled = true;
         });
-
-        // Input focus effects with reduced animation for small screens
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                if (window.innerWidth > 480) {
-                    this.parentElement.style.transform = 'scale(1.01)';
-                }
-            });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'scale(1)';
-            });
-        });
-
-        // Prevent zoom on iOS when focusing inputs
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                if (window.innerWidth < 768) {
-                    const viewport = document.querySelector('meta[name="viewport"]');
-                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
-                }
-            });
-            
-            input.addEventListener('blur', function() {
-                if (window.innerWidth < 768) {
-                    const viewport = document.querySelector('meta[name="viewport"]');
-                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
-                }
-            });
-        });
-
-        // Responsive text adjustment based on screen size
-        function adjustResponsiveText() {
-            const screenWidth = window.innerWidth;
-            const fileText = document.querySelector('.file-text');
-            
-            if (screenWidth < 320) {
-                fileText.textContent = fileText.textContent.length > 10 ? 'Document' : fileText.textContent;
-            }
-        }
-
-        // Call on load and resize
-        adjustResponsiveText();
-        window.addEventListener('resize', adjustResponsiveText);
     </script>
 </body>
 </html>
