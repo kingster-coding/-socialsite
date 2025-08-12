@@ -28,14 +28,31 @@ urlpatterns = [
     path('jobs/', views.jobs, name='jobs'),
 
     # 🎥 Go Live
-# 🎥 Go Live
-    path('go-live/', views.go_live_page, name='go_live'),  # only this renders HTML
+
+    # Renders the main Go Live HTML page
+    path('go-live/', views.go_live_page, name='go_live'),
+
+    # Create meeting
     path('go-live/create/', views.create_meeting, name='create_meeting'),
+
+    # Redirect to meeting room after creation
     path('go-live/redirect/', views.live_redirect, name='live_redirect'),
+
+    # Live meeting room by UUID
     path('go-live/<uuid:meeting_id>/', views.go_live_room, name='go_live_room'),
+
+    # Join request sent by user
     path('go-live/join-request/', views.request_to_join, name='request_to_join'),
+
+    # Host approves user's request
     path('go-live/approve/', views.approve_user, name='approve_user'),
+
+    # Upload recording to server
     path('go-live/upload-recording/', views.upload_recording, name='upload_recording'),
+
+    path('go-live/api/requests/<uuid:meeting_id>/', views.join_requests_api, name='join_requests_api'),
+
+
 
 
     # 💬 Messaging
@@ -51,5 +68,8 @@ urlpatterns = [
     path('groups/<int:group_id>/post/', views.group_post_create, name='group_post_create'),
 
     # 👤 Profiles
-    path('profile/<str:username>/', views.profile, name='profile'),
+# 👤 Profiles
+    path('profile/<str:username>/', views.profile_view, name='profile'),  # ✅ uncommented
+    path('profile/edit/', views.edit_profile, name='edit_profile'),
+
 ]

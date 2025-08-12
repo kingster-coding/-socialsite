@@ -21,6 +21,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
+from .forms import ProfileForm
 
 
 
@@ -70,9 +71,9 @@ def register(request):
 
         # ✅ Create user
         user = User.objects.create_user(username=email, email=email, password=pass1)
-        
-        # ✅ Update auto-created profile fields
-        profile = user.profile
+
+        # ✅ Access and update userprofile
+        profile = user.profile  # NOT user.profile
         profile.real_name = real_name
         profile.phone = phone
         profile.profession = profession
@@ -153,6 +154,27 @@ def user_login(request):
             return render(request, 'login.html')
 
     return render(request, 'login.html')
+
+
+def profile_view(request, username):
+    user = get_object_or_404(User, username=username)
+    return render(request, 'profile.html', {'user': user})
+
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile  # ya `UserProfile.objects.get(user=request.user)`
+    
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', username=request.user.username)
+    else:
+        form = ProfileForm(instance=profile)
+    
+    return render(request, 'edit_profile.html', {'form': form})
+
 
 
 
@@ -370,7 +392,8 @@ def jobs(request):
 
 
 
-# ✅ Central Go Live Page (no meeting_id required)
+
+# ✅ Live Room Page Render
 @login_required
 def go_live_page(request):
     return render(request, 'go_live.html')
@@ -383,14 +406,14 @@ def create_meeting(request):
     return JsonResponse({'meeting_id': str(meeting.meeting_id)})
 
 
-# ✅ Redirect to UUID-based live room after creation (optional use)
+# ✅ Redirect to UUID-based live room (if needed)
 @login_required
 def live_redirect(request):
     meeting = Meeting.objects.create(host=request.user)
     return redirect('go_live_room', meeting_id=meeting.meeting_id)
 
 
-# ✅ UUID-based Go Live Room (optional if not using separate room views)
+# ✅ Render Go Live Room
 @login_required
 def go_live_room(request, meeting_id):
     meeting = get_object_or_404(Meeting, meeting_id=meeting_id)
@@ -400,13 +423,14 @@ def go_live_room(request, meeting_id):
     })
 
 
-# ✅ Join request to host
+# ✅ Request to Join Meeting (by guest)
 @login_required
 def request_to_join(request):
     if request.method == 'POST':
         meeting_id = request.POST.get('meeting_id')
         meeting = get_object_or_404(Meeting, meeting_id=meeting_id)
 
+        # Prevent duplicate join requests
         _, created = JoinRequest.objects.get_or_create(
             meeting=meeting,
             user=request.user
@@ -416,7 +440,7 @@ def request_to_join(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-# ✅ Host approves a user
+# ✅ Host approves the user to join
 @login_required
 def approve_user(request):
     if request.method == 'POST':
@@ -436,7 +460,7 @@ def approve_user(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-# ✅ Upload recorded video file
+# ✅ Upload recorded video file after meeting
 @csrf_exempt
 def upload_recording(request):
     if request.method == 'POST':
@@ -453,6 +477,15 @@ def upload_recording(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@login_required
+def join_requests_api(request, meeting_id):
+    meeting = get_object_or_404(Meeting, meeting_id=meeting_id)
+    if request.user != meeting.host:
+        return HttpResponseForbidden("Only host can view requests.")
+
+    requests = JoinRequest.objects.filter(meeting=meeting, approved=False)
+    data = [{'id': r.user.id, 'username': r.user.username} for r in requests]
+    return JsonResponse(data, safe=False)
 
 
 

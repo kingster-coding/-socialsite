@@ -2,6 +2,12 @@ from django import forms
 from .models import Post, Comment, Story, Reel
 from .models import ResearchPaper
 from .models import Job, JobApplication
+from django import forms
+from .models import Post, Comment, Story, Reel, ResearchPaper, Job, JobApplication, Profile
+
+
+
+
 
 
 
@@ -31,10 +37,10 @@ class ReelForm(forms.ModelForm):
 
 
 class ResearchPaperForm(forms.ModelForm):
+    email = forms.EmailField()  # ✅ optional if already in model
     class Meta:
         model = ResearchPaper
-        fields = ['title', 'authors', 'email', 'category', 'abstract', 'keywords', 'pdf']
-
+        fields = ['title', 'authors', 'email', 'category', 'keywords', 'abstract', 'pdf']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter research title'}),
             'authors': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter authors'}),
@@ -44,6 +50,7 @@ class ResearchPaperForm(forms.ModelForm):
             'keywords': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter keywords'}),
             'pdf': forms.ClearableFileInput(attrs={'class': 'form-input'}),
         }
+
 
 class ResearchPaperForm(forms.ModelForm):
     email = forms.EmailField()  # ✅ if 'email' is not in model
@@ -86,3 +93,21 @@ class JobApplicationForm(forms.ModelForm):
 
 # core/forms.py
 
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = [
+            'real_name',
+            'bio',
+            'location',
+            'profile_image',
+            'cover_photo',
+            'resume',
+            'certificate',
+        ]
+        widgets = {
+            'real_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
+            'bio': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tell us about yourself'}),
+            'location': forms.TextInput(attrs={'placeholder': 'Your city or country'}),
+        }

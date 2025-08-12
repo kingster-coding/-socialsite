@@ -25,7 +25,6 @@ admin.site.register(JobApplication)
 admin.site.register(Meeting)
 admin.site.register(JoinRequest)
 admin.site.register(Recording)
-
 # Custom Admins
 
 @admin.register(Group)

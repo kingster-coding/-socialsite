@@ -2,18 +2,51 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 import uuid
-
+from PIL import Image
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    real_name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
-    profession = models.CharField(max_length=100)
-    document = models.FileField(upload_to='documents/')
+    real_name = models.CharField(max_length=100, blank=True, null=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    profession = models.CharField(max_length=100, blank=True, null=True)
+    document = models.FileField(upload_to='documents/', blank=True, null=True)
+
+    # Profile Page Extra Fields
+    profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
+    cover_photo = models.ImageField(upload_to='cover_photos/', blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    skills = models.CharField(max_length=255, blank=True, null=True)
+    education = models.CharField(max_length=255, blank=True, null=True)
+    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
+    linkedin = models.URLField(blank=True, null=True)
+    github = models.URLField(blank=True, null=True)
+    dob = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')], blank=True, null=True)
+    relationship_status = models.CharField(max_length=30, blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
+    certificate = models.FileField(upload_to='certificates/', blank=True, null=True)
+
 
     def __str__(self):
         return self.user.username
-    
+
+# ---------------- SIGNALS ---------------- #
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()  # ✅ NOT instance.userprofile
+
+
+
+
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -161,7 +194,6 @@ class JobApplication(models.Model):
 # models.py
 
 
-
 class Meeting(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     meeting_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -177,8 +209,23 @@ class JoinRequest(models.Model):
     approved = models.BooleanField(default=False)
     requested_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('meeting', 'user')  # 🚫 Prevent duplicate requests
+
     def __str__(self):
         return f"{self.user.username} requesting {self.meeting.meeting_id}"
+
+
+class ApprovedParticipant(models.Model):
+    meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('meeting', 'user')  # ✅ Ensure one-time approval per session
+
+    def __str__(self):
+        return f"{self.user.username} approved for {self.meeting.meeting_id}"
 
 
 class Recording(models.Model):
@@ -188,7 +235,6 @@ class Recording(models.Model):
 
     def __str__(self):
         return f"Recording for {self.meeting.meeting_id}"
-
 
 
 

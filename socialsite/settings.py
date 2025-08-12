@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'socialsite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'myprojectdb',        # jo tumne PostgreSQL me CREATE DATABASE se banaya
+        'USER': 'postgres',           # ya jo user banaya
+        'PASSWORD': 'Kingster@12345',  # PostgreSQL ka password
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

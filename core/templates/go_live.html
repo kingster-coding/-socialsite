@@ -466,7 +466,8 @@
   // 🚧 Placeholder: polling join requests (replace with Django Channels for real-time)
   if (isHost) {
     setInterval(() => {
-      fetch('/admin/api/requests/{{ meeting_id }}/')  // 🔁 Optional view to create
+      fetch(`/go-live/api/requests/${meetingId}/`)
+  // 🔁 Optional view to create
         .then(res => res.json())
         .then(data => {
           const container = document.getElementById("requests");
